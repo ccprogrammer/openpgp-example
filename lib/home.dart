@@ -18,10 +18,12 @@ class _HomeState extends State<Home> {
     var keyOptions = KeyOptions()..rsaBits = 2048;
 
     keyPair = await OpenPGP.generate(
-        options: Options()
-          ..name = 'test'
-          ..email = 'test@test.com'
-          ..passphrase = '');
+      options: Options()
+        ..name = 'test'
+        ..email = 'test@test.com'
+        ..passphrase = ''
+        ..keyOptions = keyOptions,
+    );
     setState(() {});
   }
 
