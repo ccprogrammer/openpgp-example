@@ -1,65 +1,64 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:openpgp/openpgp.dart';
 import 'package:opensort/component/encrypt_wrapper.dart';
 import 'package:opensort/component/expandable_text.dart';
 
-class EncryptImage extends StatefulWidget {
-  const EncryptImage({super.key, required this.keyPair});
+class EncryptFile extends StatefulWidget {
+  const EncryptFile({super.key, required this.keyPair});
   final KeyPair? keyPair;
 
   @override
-  State<EncryptImage> createState() => _EncryptImageState();
+  State<EncryptFile> createState() => _EncryptFile();
 }
 
-class _EncryptImageState extends State<EncryptImage> {
-  File? _image;
+class _EncryptFile extends State<EncryptFile> {
+  File? _file;
+
   Uint8List? encryptedBytes;
   File? decryptedBytes;
 
-  Future<void> _getImageFromGallery() async {
-    final picker = ImagePicker();
-    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
+  Future<void> _pickFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
 
-    if (pickedImage != null) {
+    if (result != null) {
       setState(() {
-        _image = File(pickedImage.path);
+        _file = File(result.files.single.path!);
       });
     }
   }
 
-  _encryptImage() async {
+  _encryptFile() async {
     try {
-      encryptedBytes = await OpenPGP.encryptBytes(
-        _image!.readAsBytesSync(),
-        widget.keyPair!.publicKey,
+      encryptedBytes = await OpenPGP.encryptSymmetricBytes(
+        _file!.readAsBytesSync(),
+        '',
       );
     } catch (_) {}
-    log('Original Image =>\n');
-    log('Encrypt Image =>\n$encryptedBytes');
+    log('Original File =>\n');
+    log('Encrypt File =>\n$encryptedBytes');
     setState(() {});
   }
 
-  _decryptImage() async {
-    log('Encrypt Image =>\n$encryptedBytes');
+  _decryptFile() async {
     try {
-      var tmpDecryptedImg = await OpenPGP.decryptBytes(
+      var tmpDecryptedFile = await OpenPGP.decryptSymmetricBytes(
         encryptedBytes!,
-        widget.keyPair!.privateKey,
         '',
       );
-      decryptedBytes = File(tmpDecryptedImg.toString());
+      log('decrypted file === $tmpDecryptedFile');
+      decryptedBytes = File(tmpDecryptedFile.toString());
     } catch (_) {}
-    log('decryptedBytes Image =>\n$decryptedBytes');
+    log('decryptedSymmetricBytes File =>\n$decryptedBytes');
     setState(() {});
   }
 
   reset() {
-    _image = null;
+    _file = null;
     encryptedBytes = null;
     decryptedBytes = null;
 
@@ -69,28 +68,28 @@ class _EncryptImageState extends State<EncryptImage> {
   @override
   Widget build(BuildContext context) {
     return EncryptWrapper(
-      label: 'Encrypt Image',
+      label: 'Encrypt File',
       reset: () => reset(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ElevatedButton(
-            onPressed: () => _getImageFromGallery(),
-            child: const Text('Get Image'),
+            onPressed: () => _pickFile(),
+            child: const Text('Pick File'),
           ),
           Container(
             margin: const EdgeInsets.only(top: 8),
-            child: _image == null
-                ? const Text('No image selected.')
-                : Image.file(_image!),
+            child: _file == null
+                ? const Text('No file selected.')
+                : Text('${_file!.path}.'),
           ),
-          if (_image != null)
+          if (_file != null)
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 8),
                 const Text(
-                  'Image Bytes',
+                  'File Bytes',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
@@ -98,26 +97,26 @@ class _EncryptImageState extends State<EncryptImage> {
                 ),
                 const SizedBox(height: 8),
                 ExpandableText(
-                    text: _image!.readAsBytesSync().toString(), trimLines: 10),
+                    text: _file!.readAsBytesSync().toString(), trimLines: 10),
               ],
             ),
           const SizedBox(height: 8),
           ElevatedButton(
-            onPressed: () => _encryptImage(),
-            child: const Text('Encrypt Bytes'),
+            onPressed: () => _encryptFile(),
+            child: const Text('Encrypt Symmetric Bytes'),
           ),
           const SizedBox(height: 8),
           if (encryptedBytes != null)
             ExpandableText(text: encryptedBytes!.toString(), trimLines: 10),
           ElevatedButton(
-            onPressed: () => _decryptImage(),
-            child: const Text('Decrypt Bytes'),
+            onPressed: () => _decryptFile(),
+            child: const Text('Decrypt Symmetric Bytes'),
           ),
           const SizedBox(height: 8),
           Container(
             child: decryptedBytes == null
-                ? const Text('Encrypted Bytes.')
-                : Image.file(_image!),
+                ? const Text('Encrypted Symmetric Bytes.')
+                : Text('${decryptedBytes!.path}.'),
           ),
         ],
       ),
