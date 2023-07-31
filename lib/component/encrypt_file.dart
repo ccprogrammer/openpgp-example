@@ -68,7 +68,7 @@ class _EncryptFile extends State<EncryptFile> {
   @override
   Widget build(BuildContext context) {
     return EncryptWrapper(
-      label: 'Encrypt File',
+      label: 'Encrypt File (Symmetric Bytes)',
       reset: () => reset(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,7 +116,7 @@ class _EncryptFile extends State<EncryptFile> {
           Container(
             child: decryptedBytes == null
                 ? const Text('Encrypted Symmetric Bytes.')
-                : Text('${decryptedBytes!.path}.'),
+                : ExpandableText(text: decryptedBytes!.path, trimLines: 10),
           ),
         ],
       ),

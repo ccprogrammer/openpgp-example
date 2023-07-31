@@ -69,7 +69,7 @@ class _EncryptImageState extends State<EncryptImage> {
   @override
   Widget build(BuildContext context) {
     return EncryptWrapper(
-      label: 'Encrypt Image',
+      label: 'Encrypt Image (Bytes)',
       reset: () => reset(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

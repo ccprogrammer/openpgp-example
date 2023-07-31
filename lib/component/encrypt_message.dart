@@ -74,7 +74,7 @@ class _EncryptMessageState extends State<EncryptMessage> {
   @override
   Widget build(BuildContext context) {
     return EncryptWrapper(
-      label: 'Encrypt Message',
+      label: 'Encrypt Message (Normal Encryption)',
       reset: () => reset(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
