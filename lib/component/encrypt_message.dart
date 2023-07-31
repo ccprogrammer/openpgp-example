@@ -62,10 +62,20 @@ class _EncryptMessageState extends State<EncryptMessage> {
     setState(() {});
   }
 
+  reset() {
+    privateKey = null;
+    publicKey = null;
+    encryptedMessage = null;
+    decryptedMessage = null;
+
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return EncryptWrapper(
       label: 'Encrypt Message',
+      reset: () => reset(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

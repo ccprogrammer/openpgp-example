@@ -1,8 +1,8 @@
-import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
 import 'package:openpgp/openpgp.dart';
+import 'package:opensort/component/encrypt_image.dart';
 import 'package:opensort/component/encrypt_message.dart';
-import 'package:opensort/component/expandable_text.dart';
+import 'package:opensort/component/my_key.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -30,68 +30,17 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => generateKey(),
+        child: const Icon(Icons.key),
+      ),
       body: ListView(
         children: [
-          buildgenerateKey(),
-          const Divider(
-            height: 48,
-            thickness: 2,
-            color: Colors.black,
-            indent: 16,
-            endIndent: 16,
-          ),
+          MyKey(keyPair: keyPair),
           const EncryptMessage(),
+          EncryptImage(keyPair: keyPair),
         ],
       ),
-    );
-  }
-
-  buildgenerateKey() => Padding(
-        padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ElevatedButton(
-              onPressed: () => generateKey(),
-              child: const Text('Generate Key'),
-            ),
-            buildKeyContainer(
-              title: 'Private Key',
-              key: '${keyPair?.privateKey}',
-              onTap: () => FlutterClipboard.copy(keyPair!.privateKey),
-            ),
-            buildKeyContainer(
-              title: 'Public Key',
-              key: '${keyPair?.publicKey}',
-              onTap: () => FlutterClipboard.copy(keyPair!.publicKey),
-            ),
-          ],
-        ),
-      );
-
-  buildKeyContainer(
-      {required String title, required String key, required Function() onTap}) {
-    return Column(
-      children: [
-        const SizedBox(height: 16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            IconButton(
-              onPressed: () => onTap(),
-              icon: const Icon(Icons.copy),
-            ),
-          ],
-        ),
-        ExpandableText(text: key, trimLines: 6),
-      ],
     );
   }
 }
