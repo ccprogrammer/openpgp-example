@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:openpgp/openpgp.dart';
@@ -132,8 +131,10 @@ class _EncryptImageState extends State<EncryptImage> {
             child: Text(encryptLoading ? 'Encrypting...' : 'Encrypt Bytes'),
           ),
           const SizedBox(height: 8),
-          if (encryptedBytes != null)
-            ExpandableText(text: encryptedBytes!.toString(), trimLines: 10),
+          encryptedBytes != null
+              ? ExpandableText(text: encryptedBytes!.toString(), trimLines: 10)
+              : const Text('Eencrypted Bytes.'),
+          const SizedBox(height: 8),
           ElevatedButton(
             onPressed: () => _decryptImage(),
             child: Text(decryptLoading ? 'Decrypting...' : 'Decrypt Bytes'),
