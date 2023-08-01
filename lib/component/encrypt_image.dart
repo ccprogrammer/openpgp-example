@@ -21,14 +21,24 @@ class _EncryptImageState extends State<EncryptImage> {
   Uint8List? encryptedBytes;
   File? decryptedBytes;
 
-  Future<void> _getImageFromGallery() async {
-    final picker = ImagePicker();
-    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
+  final ImagePicker picker = ImagePicker();
+  Future _getImageFromGallery() async {
+    try {
+      final XFile? pickedImage = await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 40,
+        maxHeight: 480,
+        maxWidth: 640,
+      );
 
-    if (pickedImage != null) {
-      setState(() {
-        _image = File(pickedImage.path);
-      });
+      if (pickedImage == null) return;
+
+      _image = File(pickedImage.path);
+      setState(() {});
+
+      log('image path =>\n${_image!.path}');
+    } catch (e) {
+      log('ERROR CRASH');
     }
   }
 
@@ -38,7 +48,9 @@ class _EncryptImageState extends State<EncryptImage> {
         _image!.readAsBytesSync(),
         widget.keyPair!.publicKey,
       );
-    } catch (_) {}
+    } catch (_) {
+      log('Crashhh');
+    }
     log('Original Image =>\n');
     log('Encrypt Image =>\n$encryptedBytes');
     setState(() {});

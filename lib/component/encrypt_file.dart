@@ -23,12 +23,16 @@ class _EncryptFile extends State<EncryptFile> {
   File? decryptedBytes;
 
   Future<void> _pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles();
 
-    if (result != null) {
-      setState(() {
-        _file = File(result.files.single.path!);
-      });
+      if (result != null) {
+        setState(() {
+          _file = File(result.files.single.path!);
+        });
+      }
+    } catch (_) {
+      log('file picker crash');
     }
   }
 
