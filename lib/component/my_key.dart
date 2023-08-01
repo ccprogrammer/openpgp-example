@@ -31,14 +31,24 @@ class MyKey extends StatelessWidget {
             title: 'Private Key',
             key: keyPair?.privateKey ?? '',
             onTap: () => keyPair?.privateKey != null
-                ? FlutterClipboard.copy(keyPair?.privateKey ?? '')
+                ? FlutterClipboard.copy(keyPair?.privateKey ?? '').then(
+                    (value) => ScaffoldMessenger.of(context)
+                            .showSnackBar(const SnackBar(
+                          content: Text('Private key copied to clipboard'),
+                          duration: Duration(seconds: 2),
+                        )))
                 : showWarning(context),
           ),
           buildKeyContainer(
             title: 'Public Key',
             key: keyPair?.publicKey ?? '',
             onTap: () => keyPair?.publicKey != null
-                ? FlutterClipboard.copy(keyPair?.publicKey ?? '')
+                ? FlutterClipboard.copy(keyPair?.publicKey ?? '').then(
+                    (value) => ScaffoldMessenger.of(context)
+                            .showSnackBar(const SnackBar(
+                          content: Text('Public key copied to clipboard'),
+                          duration: Duration(seconds: 2),
+                        )))
                 : showWarning(context),
           ),
         ],

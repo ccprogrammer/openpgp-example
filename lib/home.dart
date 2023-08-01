@@ -14,26 +14,44 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   KeyPair? keyPair;
+  bool isGenerateLoading = false;
 
-  generateKey() async {
-    var keyOptions = KeyOptions()..rsaBits = 2048;
+  Future<void> generateKey() async {
+    setState(() {
+      isGenerateLoading = true;
+    });
+    try {
+      var keyOptions = KeyOptions()..rsaBits = 2048;
 
-    keyPair = await OpenPGP.generate(
-      options: Options()
-        ..name = 'test'
-        ..email = 'test@test.com'
-        ..passphrase = ''
-        ..keyOptions = keyOptions,
-    );
-    setState(() {});
+      keyPair = await OpenPGP.generate(
+        options: Options()
+          ..name = 'test'
+          ..email = 'test@test.com'
+          ..passphrase = ''
+          ..keyOptions = keyOptions,
+      );
+    } catch (_) {}
+    setState(() {
+      isGenerateLoading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        onPressed: () => generateKey(),
-        child: const Icon(Icons.key),
+        onPressed: () => generateKey().then((value) =>
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text('Key Generated'),
+              duration: Duration(seconds: 3),
+            ))),
+        child: isGenerateLoading
+            ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(color: Colors.white),
+              )
+            : const Icon(Icons.key),
       ),
       body: ListView(
         children: [
@@ -41,6 +59,7 @@ class _HomeState extends State<Home> {
           const EncryptMessage(),
           EncryptImage(keyPair: keyPair),
           EncryptSymmetric(keyPair: keyPair),
+          const SizedBox(height: 46),
         ],
       ),
     );

@@ -17,33 +17,44 @@ class EncryptSymmetric extends StatefulWidget {
 class _EncryptSymmetric extends State<EncryptSymmetric> {
   var messageC = TextEditingController();
 
+  bool encryptLoading = false;
+  bool decryptLoading = false;
+
   Uint8List? encryptedBytes;
   String? decryptedBytes;
 
   _encryptSymmetricBytes() async {
+    setState(() {
+      encryptLoading = true;
+    });
     try {
       encryptedBytes = await OpenPGP.encryptSymmetricBytes(
         Uint8List.fromList(messageC.text.codeUnits),
         '',
       );
     } catch (_) {}
-    log('Original Message =>\n');
     log('Encrypt Message =>\n$encryptedBytes');
-    setState(() {});
+    setState(() {
+      encryptLoading = false;
+    });
   }
 
   _decryptSymmetricBytes() async {
+    setState(() {
+      decryptLoading = true;
+    });
     try {
       var tmpDecryptedMessage = await OpenPGP.decryptSymmetricBytes(
         encryptedBytes!,
         '',
       );
-      log('decrypted message === $tmpDecryptedMessage');
       decryptedBytes = tmpDecryptedMessage.toString();
     } catch (_) {}
 
     log('decryptedSymmetricBytes  =>\n$decryptedBytes');
-    setState(() {});
+    setState(() {
+      decryptLoading = false;
+    });
   }
 
   reset() {
@@ -68,7 +79,8 @@ class _EncryptSymmetric extends State<EncryptSymmetric> {
           const SizedBox(height: 8),
           ElevatedButton(
             onPressed: () => _encryptSymmetricBytes(),
-            child: const Text('Encrypt Symmetric Bytes'),
+            child: Text(
+                encryptLoading ? 'Encrypting...' : 'Encrypt Symmetric Bytes'),
           ),
           const SizedBox(height: 8),
           if (encryptedBytes != null)
@@ -76,7 +88,8 @@ class _EncryptSymmetric extends State<EncryptSymmetric> {
           const SizedBox(height: 8),
           ElevatedButton(
             onPressed: () => _decryptSymmetricBytes(),
-            child: const Text('Decrypt Symmetric Bytes'),
+            child: Text(
+                decryptLoading ? 'Decrypting...' : 'Decrypt Symmetric Bytes'),
           ),
           const SizedBox(height: 8),
           Container(

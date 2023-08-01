@@ -17,6 +17,9 @@ class EncryptImage extends StatefulWidget {
 }
 
 class _EncryptImageState extends State<EncryptImage> {
+  bool encryptLoading = false;
+  bool decryptLoading = false;
+
   File? _image;
   Uint8List? encryptedBytes;
   File? decryptedBytes;
@@ -43,6 +46,9 @@ class _EncryptImageState extends State<EncryptImage> {
   }
 
   _encryptImage() async {
+    setState(() {
+      encryptLoading = true;
+    });
     try {
       encryptedBytes = await OpenPGP.encryptBytes(
         _image!.readAsBytesSync(),
@@ -51,13 +57,16 @@ class _EncryptImageState extends State<EncryptImage> {
     } catch (_) {
       log('Crashhh');
     }
-    log('Original Image =>\n');
     log('Encrypt Image =>\n$encryptedBytes');
-    setState(() {});
+    setState(() {
+      encryptLoading = false;
+    });
   }
 
   _decryptImage() async {
-    log('Encrypt Image =>\n$encryptedBytes');
+    setState(() {
+      decryptLoading = true;
+    });
     try {
       var tmpDecryptedImg = await OpenPGP.decryptBytes(
         encryptedBytes!,
@@ -67,7 +76,9 @@ class _EncryptImageState extends State<EncryptImage> {
       decryptedBytes = File(tmpDecryptedImg.toString());
     } catch (_) {}
     log('decryptedBytes Image =>\n$decryptedBytes');
-    setState(() {});
+    setState(() {
+      decryptLoading = false;
+    });
   }
 
   reset() {
@@ -116,14 +127,14 @@ class _EncryptImageState extends State<EncryptImage> {
           const SizedBox(height: 8),
           ElevatedButton(
             onPressed: () => _encryptImage(),
-            child: const Text('Encrypt Bytes'),
+            child: Text(encryptLoading ? 'Encrypting...' : 'Encrypt Bytes'),
           ),
           const SizedBox(height: 8),
           if (encryptedBytes != null)
             ExpandableText(text: encryptedBytes!.toString(), trimLines: 10),
           ElevatedButton(
             onPressed: () => _decryptImage(),
-            child: const Text('Decrypt Bytes'),
+            child: Text(decryptLoading ? 'Decrypting...' : 'Decrypt Bytes'),
           ),
           const SizedBox(height: 8),
           Container(
