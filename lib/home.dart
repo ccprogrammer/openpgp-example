@@ -39,6 +39,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: const Text('Openpgp Demo')),
       floatingActionButton: FloatingActionButton(
         onPressed: () => generateKey().then((value) =>
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(

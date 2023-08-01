@@ -1,10 +1,10 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:openpgp/openpgp.dart';
 import 'package:opensort/component/encrypt_wrapper.dart';
-import 'package:opensort/component/expandable_text.dart';
 
 class EncryptSymmetric extends StatefulWidget {
   const EncryptSymmetric({super.key, required this.keyPair});
@@ -20,7 +20,7 @@ class _EncryptSymmetric extends State<EncryptSymmetric> {
   bool encryptLoading = false;
   bool decryptLoading = false;
 
-  Uint8List? encryptedBytes;
+  String? encryptedBytes;
   String? decryptedBytes;
 
   _encryptSymmetricBytes() async {
@@ -28,10 +28,12 @@ class _EncryptSymmetric extends State<EncryptSymmetric> {
       encryptLoading = true;
     });
     try {
-      encryptedBytes = await OpenPGP.encryptSymmetricBytes(
+      var tmp = await OpenPGP.encryptSymmetricBytes(
         Uint8List.fromList(messageC.text.codeUnits),
         '',
       );
+
+      encryptedBytes = base64Encode(tmp);
     } catch (_) {}
     log('Encrypt Message =>\n$encryptedBytes');
     setState(() {
@@ -45,10 +47,10 @@ class _EncryptSymmetric extends State<EncryptSymmetric> {
     });
     try {
       var tmpDecryptedMessage = await OpenPGP.decryptSymmetricBytes(
-        encryptedBytes!,
+        base64Decode(encryptedBytes!),
         '',
       );
-      decryptedBytes = tmpDecryptedMessage.toString();
+      decryptedBytes = String.fromCharCodes(tmpDecryptedMessage);
     } catch (_) {}
 
     log('decryptedSymmetricBytes  =>\n$decryptedBytes');
@@ -83,8 +85,11 @@ class _EncryptSymmetric extends State<EncryptSymmetric> {
                 encryptLoading ? 'Encrypting...' : 'Encrypt Symmetric Bytes'),
           ),
           const SizedBox(height: 8),
-          if (encryptedBytes != null)
-            ExpandableText(text: encryptedBytes!.toString(), trimLines: 4),
+          Container(
+            child: encryptedBytes == null
+                ? const Text('Encrypted Symmetric Bytes.')
+                : Text('$encryptedBytes'),
+          ),
           const SizedBox(height: 8),
           ElevatedButton(
             onPressed: () => _decryptSymmetricBytes(),
@@ -94,7 +99,7 @@ class _EncryptSymmetric extends State<EncryptSymmetric> {
           const SizedBox(height: 8),
           Container(
             child: decryptedBytes == null
-                ? const Text('Encrypted Symmetric Bytes.')
+                ? const Text('Decrypted Symmetric Bytes.')
                 : Text('$decryptedBytes'),
           ),
         ],

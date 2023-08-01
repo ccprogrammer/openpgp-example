@@ -112,7 +112,7 @@ class _EncryptMessageState extends State<EncryptMessage> {
             child: const Text('Decrypt Message'),
           ),
           const SizedBox(height: 8),
-          Text(decryptedMessage ?? 'Encrypted Message')
+          Text(decryptedMessage ?? 'Decrypted Message')
         ],
       ),
     );

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
@@ -21,7 +22,7 @@ class _EncryptImageState extends State<EncryptImage> {
   bool decryptLoading = false;
 
   File? _image;
-  Uint8List? encryptedBytes;
+  String? encryptedBytes;
   File? decryptedBytes;
 
   final ImagePicker picker = ImagePicker();
@@ -50,10 +51,11 @@ class _EncryptImageState extends State<EncryptImage> {
       encryptLoading = true;
     });
     try {
-      encryptedBytes = await OpenPGP.encryptBytes(
+      var tmp = await OpenPGP.encryptBytes(
         _image!.readAsBytesSync(),
         widget.keyPair!.publicKey,
       );
+      encryptedBytes = base64Encode(tmp);
     } catch (_) {
       log('Crashhh');
     }
@@ -69,7 +71,7 @@ class _EncryptImageState extends State<EncryptImage> {
     });
     try {
       var tmpDecryptedImg = await OpenPGP.decryptBytes(
-        encryptedBytes!,
+        base64Decode(encryptedBytes!),
         widget.keyPair!.privateKey,
         '',
       );
@@ -139,7 +141,7 @@ class _EncryptImageState extends State<EncryptImage> {
           const SizedBox(height: 8),
           Container(
             child: decryptedBytes == null
-                ? const Text('Encrypted Bytes.')
+                ? const Text('Decrypted Bytes.')
                 : Image.file(_image!),
           ),
         ],
