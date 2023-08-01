@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:openpgp/openpgp.dart';
-import 'package:opensort/component/encrypt_file.dart';
+import 'package:opensort/component/encrypt_symmetric.dart';
 import 'package:opensort/component/encrypt_image.dart';
 import 'package:opensort/component/encrypt_message.dart';
 import 'package:opensort/component/my_key.dart';
@@ -40,7 +40,7 @@ class _HomeState extends State<Home> {
           MyKey(keyPair: keyPair),
           const EncryptMessage(),
           EncryptImage(keyPair: keyPair),
-          EncryptFile(keyPair: keyPair),
+          EncryptSymmetric(keyPair: keyPair),
         ],
       ),
     );
